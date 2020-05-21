@@ -20,3 +20,5 @@ V. Gonzalez-Huitron, V. Ponomaryov, E. Ramos-Diaz, and S. Sadovnychiy, “Parall
 distance,” Signal, Image Video Process., vol. 12, no. 2, pp. 231–238, Feb. 2018.
 
 doi.org/10.1007/s11760-017-1150-3
+
+[![View Sparse disparity map estimation on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/75718-sparse-disparity-map-estimation)
