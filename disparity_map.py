@@ -33,7 +33,9 @@ class DisparityMap:
             shifted_image = np.roll(self.right_processed, disparity_level, axis=1)
             shifted_image = np.abs(self.left_processed - shifted_image)
             left_sad_image[:, :, 0] = signal.convolve2d(shifted_image, kernel_array, boundary='symm', mode='same')
-            left_disparity[:, :, 1] = np.min(left_sad_image, axis=0)
+            temp_sad = np.argmin(left_sad_image, axis=0)
+            left_sad_image[:, :, 0] = np.min(left_sad_image, axis=0)
+            left_disparity[:, :, 1] = np.argmin(left_sad_image, axis=0)
             ddppL[sadLEFT < sadLEFT_prev] = k
             sadLEFT_prev[sadLEFT < sadLEFT_prev] = sadLEFT[sadLEFT < sadLEFT_prev]
 
