@@ -20,11 +20,11 @@
 % Occlusions are labeled as NaN values
 % To visualize D, imshow(D,[DisparityRange])
 %% Example 1
-L = imread('stereoimages/TsukubaL.png');
-R = imread('stereoimages/TsukubaR.png');
-DisparityRange = [0 16];
+L = imread('stereoimages/imgRecIzq15.png');
+R = imread('stereoimages/imgRecDer15.png');
+DisparityRange = [0 64];
 WindowSize = 9;
-Method = 'MutualInformation';
+Method = 'SAD';
 DisparityCheck=[12,4];
 D=sparse_disparity(L,R,DisparityRange,WindowSize,Method,DisparityCheck);
 figure,
@@ -32,11 +32,11 @@ imshow(D,DisparityRange);
 title(['Disparity map - ' Method]);
 colormap jet; colorbar;
 %% Example 2
-L = imread('stereoimages/MotorcycleL.png');
-R = imread('stereoimages/MotorcycleR.png');
-DisparityRange = [0 70];
-WindowSize = 13;
-Method = 'Hamming';
+L = imread('stereoimages/imgRecIzq15.png');
+R = imread('stereoimages/imgRecDer15.png');
+DisparityRange = [0 40];
+WindowSize = 33;
+Method = 'Jaccard';
 D=sparse_disparity(L,R,DisparityRange,WindowSize,Method);
 figure,
 imshow(D,DisparityRange);

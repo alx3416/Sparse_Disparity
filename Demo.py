@@ -1,8 +1,8 @@
 import cv2
 import disparity_map as dm
 
-left_image = cv2.imread("stereoimages/MotorcycleL.png", cv2.IMREAD_COLOR)
-right_image = cv2.imread("stereoimages/MotorcycleR.png", cv2.IMREAD_COLOR)
+left_image = cv2.imread("stereoimages/KITTI06_L.png", cv2.IMREAD_COLOR)
+right_image = cv2.imread("stereoimages/KITTI06_R.png", cv2.IMREAD_COLOR)
 
 disparity_estimator = dm.DisparityMap(left_image, right_image, 80, 17)
 disparity_estimator.estimate_sparse_disparity()
