@@ -51,6 +51,7 @@ class DisparityMap:
         for disparity_level in range(0, self.disparity_range):
             self.get_left_disparity_map(disparity_level, cost_array_left)
             self.get_right_disparity_map(disparity_level, cost_array_right)
+            # match check consistency
             shifted_right_disparity = np.roll(self.right_disparity, disparity_level, axis=1)
             maskL = self.left_disparity == disparity_level
             maskR = shifted_right_disparity == disparity_level
