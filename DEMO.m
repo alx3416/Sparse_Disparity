@@ -20,9 +20,9 @@
 % Occlusions are labeled as NaN values
 % To visualize D, imshow(D,[DisparityRange])
 %% Example 1
-L = imread('stereoimages/imgRecIzq15.png');
-R = imread('stereoimages/imgRecDer15.png');
-DisparityRange = [0 64];
+L = imread('stereoimages/TsukubaL.png');
+R = imread('stereoimages/TsukubaR.png');
+DisparityRange = [0 16];
 WindowSize = 9;
 Method = 'SAD';
 DisparityCheck=[12,4];
