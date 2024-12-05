@@ -19,7 +19,7 @@ class DisparityMap:
         self.right_processed = []
         self.left_disparity = np.zeros((self.height, self.width))
         self.right_disparity = np.zeros((self.height, self.width))
-
+        self.sparse_disparity_map = np.zeros((self.height, self.width))
 
     def preprocessing(self, processing_type="GRAY"):
         if processing_type == "GRAY":
@@ -42,16 +42,20 @@ class DisparityMap:
     def get_right_disparity_map(self, disparity_level, cost_array_right):
         shifted_image2 = np.roll(self.left_processed, -disparity_level, axis=1)
         cost_array_right[:, :, 1] = signal.convolve2d(np.abs(self.right_processed - shifted_image2), self.kernel_array,
-                                                     boundary='symm', mode='same')
+                                                      boundary='symm', mode='same')
         self.right_disparity[np.argmin(cost_array_right, axis=2) == 1] = disparity_level
         cost_array_right[:, :, 0] = np.min(cost_array_right, axis=2)
 
     def estimate_left_and_right_disparity_map(self, cost_array_left, cost_array_right):
-        maskL = np.zeros((self.height, self.width))
-        maskR = np.zeros((self.height, self.width))
-        for disparity_level in range(0, self.disparity_range):  # niveles de disparidad
+        self.sparse_disparity_map = np.zeros((self.height, self.width))
+        for disparity_level in range(0, self.disparity_range):
             self.get_left_disparity_map(disparity_level, cost_array_left)
             self.get_right_disparity_map(disparity_level, cost_array_right)
+            shifted_right_disparity = np.roll(self.right_disparity, disparity_level, axis=1)
+            maskL = self.left_disparity == disparity_level
+            maskR = shifted_right_disparity == disparity_level
+            checked = np.bitwise_and(maskL, maskR)
+            self.sparse_disparity_map[checked] = disparity_level
 
     def estimate_disparity(self):
         left_sad_image = np.zeros((self.height, self.width, 2))
