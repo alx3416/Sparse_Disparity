@@ -56,6 +56,7 @@ class DisparityMap:
             maskR = shifted_right_disparity == disparity_level
             checked = np.bitwise_and(maskL, maskR)
             self.sparse_disparity_map[checked] = disparity_level
+        self.sparse_disparity_map[self.sparse_disparity_map == 0] = np.nan
 
     def estimate_disparity(self):
         left_sad_image = np.zeros((self.height, self.width, 2))
@@ -67,3 +68,6 @@ class DisparityMap:
     def estimate_sparse_disparity(self, preprocess="GRAY"):
         self.preprocessing(preprocess)
         self.estimate_disparity()
+
+    def save_sparse_disparity_map(self):
+        cv2.imwrite("disparity_map.pfm", self.sparse_disparity_map)

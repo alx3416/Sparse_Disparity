@@ -9,7 +9,7 @@ disparity_estimator.estimate_sparse_disparity()
 
 cv2.imwrite("disparityL.png", disparity_estimator.left_disparity)
 cv2.imwrite("disparityR.png", disparity_estimator.right_disparity)
-cv2.imwrite("Sparse_Disparity.png", disparity_estimator.sparse_disparity_map)
+cv2.imwrite("Sparse_Disparity.pfm", disparity_estimator.sparse_disparity_map)
 
 # cv2.imshow("image left", left_image)
 # cv2.imshow("Disparity left", disparity_estimator.left_disparity)
