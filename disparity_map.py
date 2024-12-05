@@ -8,11 +8,18 @@ class DisparityMap:
     def __init__(self, left_image, right_image, disparity_range=16, block_size=11):
         self.similarity_criterion = "SAD"
         self.disparity_range = disparity_range
+        self.kernel_array = np.ones((block_size, block_size))
         self.left_image = left_image
         self.right_image = right_image
         self.block_size = block_size
+        image_size = np.shape(self.left_image)
+        self.height = image_size[0]
+        self.width = image_size[1]
         self.left_processed = []
         self.right_processed = []
+        self.left_disparity = np.zeros((self.height, self.width))
+        self.right_disparity = np.zeros((self.height, self.width))
+
 
     def preprocessing(self, processing_type="GRAY"):
         if processing_type == "GRAY":
@@ -25,38 +32,34 @@ class DisparityMap:
         self.left_processed = self.left_processed.astype("float32") / 255.0
         self.right_processed = self.right_processed.astype("float32") / 255.0
 
-    def get_left_disparity_map(self, disparity_level, cost_array_left, kernel_array, disparity_map):
+    def get_left_disparity_map(self, disparity_level, cost_array_left, disparity_map):
         shifted_image = np.roll(self.right_processed, disparity_level, axis=1)
-        cost_array_left[:, :, 1] = signal.convolve2d(np.abs(self.left_processed - shifted_image), kernel_array,
+        cost_array_left[:, :, 1] = signal.convolve2d(np.abs(self.left_processed - shifted_image), self.kernel_array,
                                                      boundary='symm', mode='same')
         disparity_map[np.argmin(cost_array_left, axis=2) == 1] = disparity_level
         cost_array_left[:, :, 0] = np.min(cost_array_left, axis=2)
         return disparity_map
 
-    def get_right_disparity_map(self, disparity_level, cost_array_right, kernel_array, disparity_map):
+    def get_right_disparity_map(self, disparity_level, cost_array_right, disparity_map):
         shifted_image2 = np.roll(self.left_processed, -disparity_level, axis=1)
-        cost_array_right[:, :, 1] = signal.convolve2d(np.abs(self.right_processed - shifted_image2), kernel_array,
+        cost_array_right[:, :, 1] = signal.convolve2d(np.abs(self.right_processed - shifted_image2), self.kernel_array,
                                                      boundary='symm', mode='same')
         disparity_map[np.argmin(cost_array_right, axis=2) == 1] = disparity_level
         cost_array_right[:, :, 0] = np.min(cost_array_right, axis=2)
         return disparity_map
 
-    def get_left_and_right_disparity_map(self, kernel_array, cost_array_left, cost_array_right, image_size):
-        left_disparity = np.zeros((image_size[0], image_size[1]))
-        right_disparity = np.zeros((image_size[0], image_size[1]))
+    def estimate_left_and_right_disparity_map(self, cost_array_left, cost_array_right):
         for disparity_level in range(0, self.disparity_range):  # niveles de disparidad
-            left_disparity = self.get_left_disparity_map(disparity_level, cost_array_left, kernel_array, left_disparity)
-            right_disparity = self.get_right_disparity_map(disparity_level, cost_array_right, kernel_array, right_disparity)
-        return left_disparity, right_disparity
+            self.left_disparity = self.get_left_disparity_map(disparity_level, cost_array_left)
+            self.right_disparity = self.get_right_disparity_map(disparity_level, cost_array_right)
 
     def estimate_disparity(self):
-        image_size = np.shape(self.left_processed)
-        kernel_array = np.ones((self.block_size, self.block_size))
-        left_sad_image = np.zeros((image_size[0], image_size[1], 2))
+        left_sad_image = np.zeros((self.height, self.width, 2))
         left_sad_image[:, :, :] = np.inf
-        left_disparity, right_disparity = self.get_left_and_right_disparity_map(kernel_array, left_sad_image, left_sad_image, image_size)
-        return left_disparity, right_disparity
+        right_sad_image = np.zeros((self.height, self.width, 2))
+        right_sad_image[:, :, :] = np.inf
+        self.estimate_left_and_right_disparity_map(left_sad_image, right_sad_image)
 
-    def get_sparse_disparity(self, preprocess="GRAY"):
+    def estimate_sparse_disparity(self, preprocess="GRAY"):
         self.preprocessing(preprocess)
-        return self.estimate_disparity()
+        self.estimate_disparity()
